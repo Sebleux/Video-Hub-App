@@ -8,5 +8,6 @@
     "main.js": true,
     "node/*.js": true,
     "src/**/*.js": true,
-  }
+  },
+  "angular.enable-strict-mode-prompt": false
 }
