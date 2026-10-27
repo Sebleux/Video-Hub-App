@@ -14,7 +14,6 @@ interface FolderProperties {
   mtime: number;           //                 corresponds to ImageElement `mtime`
   starAverage: StarRating; // averaged weight of stars rounded to nearest `StarRating`
   timesPlayed: number      //                 corresponds to ImageElement `timesPlayed`
-  uuid: string             // so that @for can `track` uniquely
 }
 
 
@@ -38,9 +37,6 @@ export class FolderViewPipe implements PipeTransform {
     let totalDuration = 0;
     let totalFileSize = 0;
     let totalStars = 0;
-
-    // unsure if `folder` is needed here, but just in case to prevent uuid collision
-    const uuid = 'folder' + files[0].uuid;
 
     files.forEach((element: ImageElement) => {
       totalFileSize += element.fileSize;
@@ -74,7 +70,6 @@ export class FolderViewPipe implements PipeTransform {
       mtime: lastUpdated,
       starAverage: starString,
       timesPlayed: timesPlayed,
-      uuid: uuid,
     };
   }
 
@@ -243,7 +238,9 @@ export class FolderViewPipe implements PipeTransform {
           folderWithStuff.partialPath     = (prefixPath || '/') + key, // must set this for the folder click to register!
           folderWithStuff.stars           = folderProperties.starAverage;
           folderWithStuff.timesPlayed     = folderProperties.timesPlayed;
-          folderWithStuff.uuid            = folderProperties.uuid;
+          // must be unique per folder path: a uuid derived from the first file would collide with the parent folder
+          // (same first file) and @for would reuse the parent's component, showing its preview thumbnails
+          folderWithStuff.uuid            = 'folder' + folderWithStuff.partialPath;
 
           arrWithFolders.push(folderWithStuff);
         }
